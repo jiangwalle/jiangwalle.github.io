@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>portfolio | WALL-E</title>
+  <title>react-router基础教程 | WALL-E</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="技术宅的自我修养">
-<meta property="og:type" content="website">
-<meta property="og:title" content="portfolio">
-<meta property="og:url" content="http://yoursite.com/portfolio/index.html">
+  <meta name="description" content="在web应用中，通常会根据功能划分多个页面。例如在浏览器中打开https://jiangwalle.github.com可以进入到博客的首页，输入https://jiangwalle.github.com/categories/随笔就会跳转到随笔分类中。react-router是一个开源的react库，可以帮助我们在react应用中实现页面跳转。 下面我们通过一个完整的实例来探寻react-rou">
+<meta name="keywords" content="react-router,react,tutorial">
+<meta property="og:type" content="article">
+<meta property="og:title" content="react-router基础教程">
+<meta property="og:url" content="http://yoursite.com/2018/04/10/react-router-playground/index.html">
 <meta property="og:site_name" content="WALL-E">
-<meta property="og:description" content="技术宅的自我修养">
-<meta property="og:updated_time" content="2018-02-13T10:04:32.423Z">
+<meta property="og:description" content="在web应用中，通常会根据功能划分多个页面。例如在浏览器中打开https://jiangwalle.github.com可以进入到博客的首页，输入https://jiangwalle.github.com/categories/随笔就会跳转到随笔分类中。react-router是一个开源的react库，可以帮助我们在react应用中实现页面跳转。 下面我们通过一个完整的实例来探寻react-rou">
+<meta property="og:updated_time" content="2018-04-09T20:35:43.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="portfolio">
-<meta name="twitter:description" content="技术宅的自我修养">
+<meta name="twitter:title" content="react-router基础教程">
+<meta name="twitter:description" content="在web应用中，通常会根据功能划分多个页面。例如在浏览器中打开https://jiangwalle.github.com可以进入到博客的首页，输入https://jiangwalle.github.com/categories/随笔就会跳转到随笔分类中。react-router是一个开源的react库，可以帮助我们在react应用中实现页面跳转。 下面我们通过一个完整的实例来探寻react-rou">
   
     <link rel="alternate" href="/atom.xml" title="WALL-E" type="application/atom+xml">
   
@@ -71,12 +72,16 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-react-router-playground" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/portfolio/index.html" class="article-date">
-  <time datetime="2018-02-13T10:04:32.000Z" itemprop="datePublished">2018-02-13</time>
+    <a href="/2018/04/10/react-router-playground/" class="article-date">
+  <time datetime="2018-04-09T20:09:24.000Z" itemprop="datePublished">2018-04-10</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/随笔/">随笔</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
@@ -85,7 +90,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      portfolio
+      react-router基础教程
     </h1>
   
 
@@ -95,14 +100,20 @@
       
         <!-- Table of Contents -->
         
-        
+        <p>在web应用中，通常会根据功能划分多个页面。例如在浏览器中打开<a href="https://jiangwalle.github.com" target="_blank" rel="noopener">https://jiangwalle.github.com</a>可以进入到博客的首页，输入<a href="https://jiangwalle.github.com/categories/随笔" target="_blank" rel="noopener">https://jiangwalle.github.com/categories/随笔</a>就会跳转到随笔分类中。<br>react-router是一个开源的react库，可以帮助我们在react应用中实现页面跳转。</p>
+<p>下面我们通过一个完整的实例来探寻react-router的常见用法。本教程使用creat-react-app搭建开发环境，react-router版本为4.2.2。</p>
+<h2 id="一、搭建环境"><a href="#一、搭建环境" class="headerlink" title="一、搭建环境"></a>一、搭建环境</h2><p>安装creact-react-app，并初始化工程<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install -g creact-react-app</span><br><span class="line">creat-react-app react-router-playground</span><br></pre></td></tr></table></figure></p>
+<p>安装react-router库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd react-router-playground</span><br><span class="line">yarn add react-router-dom</span><br></pre></td></tr></table></figure></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/portfolio/index.html" data-id="cjdqjmowa000loyq5615dxo8j" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjfso7gah0000bjynm4t0jsmy" class="article-share-link">分享</a>
       
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react-router/">react-router</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tutorial/">tutorial</a></li></ul>
+
     </footer>
   </div>
   
@@ -149,6 +160,16 @@
   </div>
 
     
+<nav id="article-nav">
+  
+  
+    <a href="/2018/02/17/markdown/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">markdown基本语法</div>
+    </a>
+  
+</nav>
+
   
 </article>
  
@@ -174,34 +195,24 @@
 
   
     
-  
+    <div class="widget-wrap">
     
-
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title recent-posts">最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2018/04/10/react-router-playground/">react-router基础教程</a>
-          </li>
-        
-          <li>
-            <a href="/2018/02/17/markdown/">markdown基本语法</a>
-          </li>
-        
-          <li>
-            <a href="/2018/02/17/hexo-setup-1/">使用hexo+github搭建博客(一)</a>
-          </li>
-        
-      </ul>
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、搭建环境"><span class="toc-number">1.</span> <span class="toc-text">一、搭建环境</span></a></li></ol>
+          </div>
+      </div>
     </div>
-  </div>
 
+  
+    
+
+  
+    
+  
+    
   
     
 
