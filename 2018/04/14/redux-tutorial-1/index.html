@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redux入门教程(一) | WALL-E</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="背景在React应用中，我们通常会把页面拆分成一个个尽可能小的组件，组件的功能越细化、纯粹，可复用性就越高。然而，在实现页面的交互逻辑是，经常会需要涉及到多个组件之间的交互。常见的组件通信方式有：  通过context api来存放需要共享的数据。 使用回调函数在共同的祖先里进行数据交换。  回调函数实例考虑这样一个案例，一个页面中有两个组件构成，&amp;lt;Header /&amp;gt;组件为页面的头部，">
+<meta name="keywords" content="redux,react,tutorial">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redux入门教程(一)">
+<meta property="og:url" content="http://yoursite.com/2018/04/14/redux-tutorial-1/index.html">
+<meta property="og:site_name" content="WALL-E">
+<meta property="og:description" content="背景在React应用中，我们通常会把页面拆分成一个个尽可能小的组件，组件的功能越细化、纯粹，可复用性就越高。然而，在实现页面的交互逻辑是，经常会需要涉及到多个组件之间的交互。常见的组件通信方式有：  通过context api来存放需要共享的数据。 使用回调函数在共同的祖先里进行数据交换。  回调函数实例考虑这样一个案例，一个页面中有两个组件构成，&amp;lt;Header /&amp;gt;组件为页面的头部，">
+<meta property="og:image" content="http://yoursite.com/2018/04/14/redux-tutorial-1/redux-flow.jpg">
+<meta property="og:updated_time" content="2018-04-17T20:18:32.574Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redux入门教程(一)">
+<meta name="twitter:description" content="背景在React应用中，我们通常会把页面拆分成一个个尽可能小的组件，组件的功能越细化、纯粹，可复用性就越高。然而，在实现页面的交互逻辑是，经常会需要涉及到多个组件之间的交互。常见的组件通信方式有：  通过context api来存放需要共享的数据。 使用回调函数在共同的祖先里进行数据交换。  回调函数实例考虑这样一个案例，一个页面中有两个组件构成，&amp;lt;Header /&amp;gt;组件为页面的头部，">
+<meta name="twitter:image" content="http://yoursite.com/2018/04/14/redux-tutorial-1/redux-flow.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="WALL-E" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">WALL-E</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">机器人瓦力的网络日志</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-redux-tutorial-1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/14/redux-tutorial-1/" class="article-date">
+  <time datetime="2018-04-14T00:30:54.000Z" itemprop="datePublished">2018-04-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/随笔/">随笔</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      redux入门教程(一)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在React应用中，我们通常会把页面拆分成一个个尽可能小的组件，组件的功能越细化、纯粹，可复用性就越高。然而，在实现页面的交互逻辑是，经常会需要涉及到多个组件之间的交互。常见的组件通信方式有：</p>
+<ul>
+<li>通过context api来存放需要共享的数据。</li>
+<li>使用回调函数在共同的祖先里进行数据交换。</li>
+</ul>
+<h2 id="回调函数实例"><a href="#回调函数实例" class="headerlink" title="回调函数实例"></a>回调函数实例</h2><p>考虑这样一个案例，一个页面中有两个组件构成，<code>&lt;Header /&gt;</code>组件为页面的头部，<code>&lt;Theme /&gt;</code>组件有几个按钮，可以设置<code>&lt;Header /&gt;</code>组件的背景颜色。<br>src/components/Header.js：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Component &#125; from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">export default class Header extends Component &#123;</span><br><span class="line">  render() &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;header className=&quot;App-header&quot; style=&#123;&#123;backgroundColor: this.props.bgColor&#125;&#125; /&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：<code>Header</code>组件通过props接收外部传入的背景颜色(bgColor)。</p>
+<p>src/components/Theme.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Component &#125; from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">export default class Theme extends Component &#123;</span><br><span class="line">  constructor(props) &#123;</span><br><span class="line">    super(props);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  changeColor = (color) =&gt; &#123;</span><br><span class="line">    this.props.onColorChange(color);  </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div style=&#123;&#123;margin: &apos;20px&apos;&#125;&#125;&gt;</span><br><span class="line">        &lt;button onClick=&#123;this.changeColor.bind(this, &apos;blue&apos;)&#125;&gt;blue&lt;/button&gt;</span><br><span class="line">        &lt;button onClick=&#123;this.changeColor.bind(this, &apos;pink&apos;)&#125;&gt;pink&lt;/button&gt;</span><br><span class="line">        &lt;button onClick=&#123;this.changeColor.bind(this, &apos;red&apos;)&#125;&gt;red&lt;/button&gt;</span><br><span class="line">        &lt;button onClick=&#123;this.changeColor.bind(this, &apos;black&apos;)&#125;&gt;black&lt;/button&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：<code>Theme</code>组件接收一个回调函数，当按钮被点击时，触发回调函数，将颜色值触底到parent组件中，在此例中为<code>App</code>组件。</p>
+<p>src/App.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Component &#125; from &apos;react&apos;;</span><br><span class="line">import &apos;./App.css&apos;;</span><br><span class="line">import Header from &apos;./components/Header&apos;;</span><br><span class="line">import Theme from &apos;./components/Theme&apos;;</span><br><span class="line"></span><br><span class="line">class App extends Component &#123;</span><br><span class="line">  constructor(props) &#123;</span><br><span class="line">    super(props);</span><br><span class="line">    this.state = &#123;</span><br><span class="line">      &apos;bgColor&apos;: &apos;&apos;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    this.onColorChange = this.onColorChange.bind(this);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  onColorChange(color) &#123;</span><br><span class="line">    this.setState(&#123;&apos;bgColor&apos;: color&#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div className=&quot;App&quot;&gt;</span><br><span class="line">        &lt;Header bgColor=&#123;this.state.bgColor&#125; /&gt;</span><br><span class="line">        &lt;Theme onColorChange=&#123;this.onColorChange&#125; /&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default App;</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：<code>App</code>组件传递回调函数到<code>Theme</code>组件，当<code>Theme</code>中的按钮点击后，触发回调函数，然后<code>App</code>再将拿到的颜色值通过props传递到<code>Header</code>组件中，以此完成从<code>Theme</code>组件到<code>Header</code>组件的通信。</p>
+<h2 id="困难"><a href="#困难" class="headerlink" title="困难"></a>困难</h2><p>此例中<code>Header</code>组件和<code>Theme</code>组件相邻，只需要通过<code>App</code>组件传递回调函数即可。但是当系统非常大时，很有可能<code>Header</code>和<code>Theme</code>相距甚远。那么就需要在很多的上级组件之间传递回调函数。非常麻烦。<br>为了解决这个问题，2014年，facebook提出flux的概念。Redux就是基于这种思想的一种实现方式。redux库已经成为react工具家族中不可或缺的一部分。</p>
+<h1 id="redux设计思想"><a href="#redux设计思想" class="headerlink" title="redux设计思想"></a>redux设计思想</h1><p>redux的设计思想归纳起来有两点：</p>
+<ul>
+<li>web应用是一个状态机，视图和状态一一对应。</li>
+<li>所有的状态(state)，保存在一个对象里。</li>
+</ul>
+<p>如何来理解这两句话呢？举个小例子。在上大学的时候，冬天，很冷。很多人就会逃课，卧床不起。中午就想让班里去上课的同学带点饭回来。一般来说，需要一个个去联系熟悉的同学。有时候，联系的人不在或者没法带，就得继续联系其他人。尤其是其他寝室的同学，联系起来比较不便。为了解决这个问题，出现了一个雷锋同学，他游走于各个寝室，统计大家需要带的饭，然后把订单交给帮忙带饭的同学，当饭被带回来后，他在跑回各个寝室把饭发给大家。这里的雷锋模式就是redux思想的实现，每个需要带饭的人都是一个组件，组件之间不再需要相互交互，当带饭的同学买到饭后，不用知道要交给谁，交给雷锋就行了。由雷锋进行统一派送即可。而每一个需要买饭的同学，也只要跟雷锋进行沟通即可。</p>
+<h1 id="redux核心概念"><a href="#redux核心概念" class="headerlink" title="redux核心概念"></a>redux核心概念</h1><h2 id="Store"><a href="#Store" class="headerlink" title="Store"></a>Store</h2><p>Store就是存放数据的地方，在react应用中，只有一个store，它存储了所有的state。在上例中，store就是雷锋。<br>redux库中提供<code>createStore</code>函数来生成store实例.<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(fn);</span><br></pre></td></tr></table></figure></p>
+<h2 id="State"><a href="#State" class="headerlink" title="State"></a>State</h2><p>State就是组件的状态信息。对应上例，饭就是组件的状态。store中包含所有的state信息。可以通过<code>store.getState()</code>拿到当前的状态信息。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(fn);</span><br><span class="line"></span><br><span class="line">const state = store.getState();</span><br></pre></td></tr></table></figure></p>
+<h2 id="Action"><a href="#Action" class="headerlink" title="Action"></a>Action</h2><p>redux规定，不允许直接修改store中的state信息。如果要修改，有且只有一种方式，就是向store发送一个action，action的格式为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const action = &#123;</span><br><span class="line">  type: &apos;buy_food&apos;,</span><br><span class="line">  payload: &apos;bread&apos;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>action一般由view触发，例如，选择面包商品后，点击购买按钮。就会发送一个购买的action。</p>
+<h2 id="Action-Creator"><a href="#Action-Creator" class="headerlink" title="Action Creator"></a>Action Creator</h2><p>在复杂的应用中，action会非常多，每一次去构造action对象会比较麻烦，所以，可以创建一个工具方法，来生成action。这个工具方法就是Action Creator。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const BUY_FOOD = &apos;buy_food&apos;;</span><br><span class="line"></span><br><span class="line">function buyFood(foodName) &#123;</span><br><span class="line">  return &#123;</span><br><span class="line">    type: BUY_FOOD,</span><br><span class="line">    foodName</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const action = buyFood(&apos;bread&apos;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="store-dispatch"><a href="#store-dispatch" class="headerlink" title="store.dispatch()"></a>store.dispatch()</h2><p>store.dispatch()是view发送action的唯一方式。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(fn);</span><br><span class="line"></span><br><span class="line">store.dispatch(&#123;</span><br><span class="line">  type: &apos;ADD_TODO&apos;,</span><br><span class="line">  payload: &apos;Learn Redux&apos;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>结合Action Creator:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">store.dispatch(addTodo(&apos;Learn Redux&apos;));</span><br></pre></td></tr></table></figure></p>
+<h2 id="reducer"><a href="#reducer" class="headerlink" title="reducer"></a>reducer</h2><p>store收到action之后，必须要计算出一个新的state，然后通知view，这样view才会发生变化。这个state的计算过程就叫reducer。<br>reducer是一个函数，它接收action和当前的state作为参数，返回一个新的state。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const reducer = function (state, action) &#123;</span><br><span class="line">  // ...</span><br><span class="line">  return new_state;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>在实际应用中，当组件调用<code>store.dispatch</code>函数向store发送一个action命令后，会自动触发reducer执行。所以，store需要知道reducer函数。做法就是在创建store时，将reducerc还如<code>createStore</code>方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(reducer);</span><br></pre></td></tr></table></figure></p>
+<h2 id="纯函数"><a href="#纯函数" class="headerlink" title="纯函数"></a>纯函数</h2><p>Reducer 函数最重要的特征是，它是一个纯函数。也就是说，只要是同样的输入，必定得到同样的输出。<br>纯函数是函数式编程的概念，必须遵守以下一些约束。</p>
+<ul>
+<li>不得改写参数</li>
+<li>不能调用系统 I/O 的API</li>
+<li>不能调用Date.now()或者Math.random()等不纯的方法，因为每次会得到不一样的结果</li>
+</ul>
+<p>由于 Reducer 是纯函数，就可以保证同样的State，必定得到同样的 View。但也正因为这一点，Reducer 函数里面不能改变 State，必须返回一个全新的对象，请参考下面的写法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// State 是一个对象</span><br><span class="line">function reducer(state, action) &#123;</span><br><span class="line">  return Object.assign(&#123;&#125;, state, &#123; thingToChange &#125;);</span><br><span class="line">  // 或者</span><br><span class="line">  return &#123; ...state, ...newState &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// State 是一个数组</span><br><span class="line">function reducer(state, action) &#123;</span><br><span class="line">  return [...state, newItem];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最好把 State 对象设成只读。你没法改变它，要得到新的 State，唯一办法就是生成一个新对象。这样的好处是，任何时候，与某个 View 对应的 State 总是一个不变的对象。</p>
+<h2 id="store-subscribe"><a href="#store-subscribe" class="headerlink" title="store.subscribe()"></a>store.subscribe()</h2><p>Store 允许使用<code>store.subscribe</code>方法设置监听函数，一旦 State 发生变化，就自动执行这个函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(reducer);</span><br><span class="line"></span><br><span class="line">store.subscribe(listener);</span><br></pre></td></tr></table></figure></p>
+<p>显然，只要把 View 的更新函数（对于 React 项目，就是组件的render方法或setState方法）放入listen，就会实现 View 的自动渲染。<br>store.subscribe方法返回一个函数，调用这个函数就可以解除监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let unsubscribe = store.subscribe(() =&gt;</span><br><span class="line">  console.log(store.getState())</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">unsubscribe();</span><br></pre></td></tr></table></figure></p>
+<h1 id="Reducer的拆分"><a href="#Reducer的拆分" class="headerlink" title="Reducer的拆分"></a>Reducer的拆分</h1><p>Reducer函数负责生成state。由于整个react应用只有一个State对象，包含所有数据，对于大型应用，这个State必然非常庞大，导致reducer也非常庞大。</p>
+<h1 id="Redux执行流程"><a href="#Redux执行流程" class="headerlink" title="Redux执行流程"></a>Redux执行流程</h1><p><img src="redux-flow.jpg" alt=""><br>首先view发出action<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">store.dispatch(action)</span><br></pre></td></tr></table></figure></p>
+<p>然后，Store会自动调用Reducer，并且传入两个参数，当前的State和s收到的Action。Reducer计算并返回新的State。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let newState = counterReducer(currentState, action);</span><br></pre></td></tr></table></figure></p>
+<p>State一旦发生变化，Store就会调用监听函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 设置监听函数</span><br><span class="line">store.subscribe(listener);</span><br></pre></td></tr></table></figure></p>
+<p><code>listener</code>可以通过<code>store.getState()</code>得到当前的状态。从而重新渲染view。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function listerner() &#123;</span><br><span class="line">  let newState = store.getState();</span><br><span class="line">  component.setState(newState);   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="counter实例"><a href="#counter实例" class="headerlink" title="counter实例"></a>counter实例</h1><p>一个redux版本的简单计数器。</p>
+<p>安装redux库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add redux</span><br></pre></td></tr></table></figure></p>
+<p>src/components/Counter.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Component &#125; from &apos;react&apos;;</span><br><span class="line"></span><br><span class="line">export default class Counter extends Component &#123;</span><br><span class="line">  constructor(props) &#123;</span><br><span class="line">    super(props);</span><br><span class="line">    this.state = &#123;</span><br><span class="line">      count: &apos;&apos;</span><br><span class="line">    &#125;</span><br><span class="line">    this.store = props.store;</span><br><span class="line">    this.getCountFromStore = this.getCountFromStore.bind(this);</span><br><span class="line">    this.render = this.render.bind(this);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    this.store.subscribe(this.getCountFromStore);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  getCountFromStore() &#123;</span><br><span class="line">    this.setState(&#123;&apos;count&apos;: this.store.getState()&#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    const value = this.store.getState();</span><br><span class="line">    return(</span><br><span class="line">      &lt;p&gt;</span><br><span class="line">          Clicked: &#123;value&#125; times</span><br><span class="line">          &lt;button onClick=&#123;() =&gt; this.store.dispatch(&#123;type: &apos;INCREMENT&apos;&#125;)&#125;&gt;+&lt;/button&gt;</span><br><span class="line">          &lt;button onClick=&#123;() =&gt; this.store.dispatch(&#123;type: &apos;DECREMENT&apos;&#125;)&#125;&gt;-&lt;/button&gt;</span><br><span class="line">      &lt;/p&gt;</span><br><span class="line">    )</span><br><span class="line">  &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：<code>Counter</code>组件接收store参数，点击按钮时，通过<code>store.dispath</code>向store中发送action。同时，在<code>componentDidMount</code>时，向store注册<code>getCountFromStore</code>回调函数，当state发生变化时，从store中拿到当前的count值，并渲染出来。</p>
+<p>src/reducers/counter.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">export default (state = 0, action) =&gt; &#123;</span><br><span class="line">  switch(action.type) &#123;</span><br><span class="line">    case &apos;INCREMENT&apos;:</span><br><span class="line">      return state + 1;</span><br><span class="line">    case &apos;DECREMENT&apos;:</span><br><span class="line">      return state - 1;</span><br><span class="line">    default:</span><br><span class="line">      return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>src/index.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">import counter from &apos;./reducers/counter&apos;;</span><br><span class="line">import Counter from &apos;./components/Counter&apos;;</span><br><span class="line"></span><br><span class="line">const store = createStore(counter);</span><br><span class="line"></span><br><span class="line">ReactDOM.render(&lt;Counter store=&#123;store&#125; /&gt;, document.getElementById(&apos;root&apos;));</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：使用<code>createStore</code>初始化store实例，然后传入到<code>Counter</code>组件中使用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg44649i0001738waatoii8m" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redux/">redux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tutorial/">tutorial</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>Recommended Posts</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/04/10/react-router-playground/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">react-router基础教程</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">Content</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#回调函数实例"><span class="toc-number">1.1.</span> <span class="toc-text">回调函数实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#困难"><span class="toc-number">1.2.</span> <span class="toc-text">困难</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#redux设计思想"><span class="toc-number">2.</span> <span class="toc-text">redux设计思想</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#redux核心概念"><span class="toc-number">3.</span> <span class="toc-text">redux核心概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Store"><span class="toc-number">3.1.</span> <span class="toc-text">Store</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#State"><span class="toc-number">3.2.</span> <span class="toc-text">State</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Action"><span class="toc-number">3.3.</span> <span class="toc-text">Action</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Action-Creator"><span class="toc-number">3.4.</span> <span class="toc-text">Action Creator</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#store-dispatch"><span class="toc-number">3.5.</span> <span class="toc-text">store.dispatch()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#reducer"><span class="toc-number">3.6.</span> <span class="toc-text">reducer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纯函数"><span class="toc-number">3.7.</span> <span class="toc-text">纯函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#store-subscribe"><span class="toc-number">3.8.</span> <span class="toc-text">store.subscribe()</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reducer的拆分"><span class="toc-number">4.</span> <span class="toc-text">Reducer的拆分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Redux执行流程"><span class="toc-number">5.</span> <span class="toc-text">Redux执行流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#counter实例"><span class="toc-number">6.</span> <span class="toc-text">counter实例</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2018 Walle Jiang&nbsp;|&nbsp;
+      Theme by <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      Contact&nbsp;|&nbsp;jiangwalle@gmail.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
