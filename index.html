@@ -155,11 +155,12 @@
 <p>src/reducers/counter.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">export default (state = 0, action) =&gt; &#123;</span><br><span class="line">  switch(action.type) &#123;</span><br><span class="line">    case &apos;INCREMENT&apos;:</span><br><span class="line">      return state + 1;</span><br><span class="line">    case &apos;DECREMENT&apos;:</span><br><span class="line">      return state - 1;</span><br><span class="line">    default:</span><br><span class="line">      return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>src/index.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">import counter from &apos;./reducers/counter&apos;;</span><br><span class="line">import Counter from &apos;./components/Counter&apos;;</span><br><span class="line"></span><br><span class="line">const store = createStore(counter);</span><br><span class="line"></span><br><span class="line">ReactDOM.render(&lt;Counter store=&#123;store&#125; /&gt;, document.getElementById(&apos;root&apos;));</span><br></pre></td></tr></table></figure></p>
 <p>代码说明：使用<code>createStore</code>初始化store实例，然后传入到<code>Counter</code>组件中使用。</p>
+<p>源代码请参考：<img src="https://github.com/jiangwalle/reudx-tutorial/tree/component-communication" alt="https://github.com/jiangwalle/reudx-tutorial/tree/component-communication"></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg53306h0004pt8wko17d9ad" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg53gpwg00052u8we9f83ki0" class="article-share-link">分享</a>
       
       
       
@@ -236,7 +237,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg533071000lpt8wkx9mhssn" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg53gpwe00042u8w9y74j50x" class="article-share-link">分享</a>
       
       
       
@@ -327,7 +328,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg53306e0001pt8wkq1093qr" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg53gpwb00012u8wswqmiels" class="article-share-link">分享</a>
       
       
       
@@ -382,7 +383,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg53306a0000pt8wvdy1wvu2" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg53gpw700002u8wbajcr2c1" class="article-share-link">分享</a>
       
       
       
