@@ -40,7 +40,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -137,7 +137,13 @@
 <p>最好把 State 对象设成只读。你没法改变它，要得到新的 State，唯一办法就是生成一个新对象。这样的好处是，任何时候，与某个 View 对应的 State 总是一个不变的对象。</p>
 <h2 id="store-subscribe"><a href="#store-subscribe" class="headerlink" title="store.subscribe()"></a>store.subscribe()</h2><p>Store 允许使用<code>store.subscribe</code>方法设置监听函数，一旦 State 发生变化，就自动执行这个函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(reducer);</span><br><span class="line"></span><br><span class="line">store.subscribe(listener);</span><br></pre></td></tr></table></figure></p>
 <p>显然，只要把 View 的更新函数（对于 React 项目，就是组件的render方法或setState方法）放入listen，就会实现 View 的自动渲染。<br>store.subscribe方法返回一个函数，调用这个函数就可以解除监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let unsubscribe = store.subscribe(() =&gt;</span><br><span class="line">  console.log(store.getState())</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">unsubscribe();</span><br></pre></td></tr></table></figure></p>
-<h1 id="Reducer的拆分"><a href="#Reducer的拆分" class="headerlink" title="Reducer的拆分"></a>Reducer的拆分</h1><p>Reducer函数负责生成state。由于整个react应用只有一个State对象，包含所有数据，对于大型应用，这个State必然非常庞大，导致reducer也非常庞大。</p>
+<h1 id="Reducer的拆分"><a href="#Reducer的拆分" class="headerlink" title="Reducer的拆分"></a>Reducer的拆分</h1><p>Reducer函数负责生成state。由于整个react应用只有一个State对象，包含所有数据，对于大型应用，这个State必然非常庞大，导致reducer也非常庞大。<br>例如如下的reducer：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">const appReducer = (state = defaultState, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case ADD_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.concat(payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    case DELETE_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.filter(order =&gt; order !== payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    case CHANGE_PASSWORD:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        password: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    case CHANGE_EMAIL:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        email: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    default: return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>上面的三种action，分别修改了state的两种属性。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ADD_ORDER: orders属性，添加一个新order</span><br><span class="line">DELETE_ORDER: orders属性，移除一个order</span><br><span class="line">CHANGE_PASSWORD: password属性，修改password</span><br><span class="line">CHANGE_EMAIL: email属性，修改email</span><br></pre></td></tr></table></figure></p>
+<p>一般来说，orders属性和password属性分别属于不同的页面，前者是订单管理页面，后者是个人信息管理页面。因此，我们可以将整个reducer拆分为两个，一方面方便管理，另一方面，拆分出来的reducer与页面相对应，从而增加了可读性。</p>
+<p>orderReducer.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const orderReducer = (state = defaultState, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case ADD_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.concat(payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    case DELETE_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.filter(order =&gt; order !== payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    default: return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>userReducer.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const userReducer = (state = defaultState, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case CHANGE_PASSWORD:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        password: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    case CHANGE_EMAIL:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        email: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    default: return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>redux中提供一个<code>combineReducers</code>方法，用于将所有的子reducer合并成一个。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const rootReducer = combineReducers(&#123;</span><br><span class="line">  orderReducer: orderReducer,</span><br><span class="line">  userReducer: userReducer</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>代码中属性名称和reducer名称相同，可简化为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const rootReducer = combineReducers(&#123;</span><br><span class="line">  orderReducer,</span><br><span class="line">  userReducer</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 <h1 id="Redux执行流程"><a href="#Redux执行流程" class="headerlink" title="Redux执行流程"></a>Redux执行流程</h1><p><img src="redux-flow.jpg" alt=""><br>首先view发出action<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">store.dispatch(action)</span><br></pre></td></tr></table></figure></p>
 <p>然后，Store会自动调用Reducer，并且传入两个参数，当前的State和s收到的Action。Reducer计算并返回新的State。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let newState = counterReducer(currentState, action);</span><br></pre></td></tr></table></figure></p>
 <p>State一旦发生变化，Store就会调用监听函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 设置监听函数</span><br><span class="line">store.subscribe(listener);</span><br></pre></td></tr></table></figure></p>
@@ -153,7 +159,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg44649i0001738waatoii8m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg53306h0004pt8wko17d9ad" class="article-share-link">分享</a>
       
       
       
@@ -230,7 +236,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg4464a4000l738wz038acjm" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg533071000lpt8wkx9mhssn" class="article-share-link">分享</a>
       
       
       
@@ -321,7 +327,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg44649m0004738whf79ja8l" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg53306e0001pt8wkq1093qr" class="article-share-link">分享</a>
       
       
       
@@ -376,7 +382,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg44649f0000738wgjiujeic" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg53306a0000pt8wvdy1wvu2" class="article-share-link">分享</a>
       
       
       
@@ -418,7 +424,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title categories">Categories</h3>
+    <h3 class="widget-title categories">分类</h3>
     <div class="widget" id="categories">
       <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/">随笔</a><span class="category-list-count">4</span></li></ul>
     </div>
@@ -428,7 +434,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title tagcloud">Tag Cloud</h3>
+    <h3 class="widget-title tagcloud">标签云</h3>
     <div class="widget tagcloud">
       <a href="/tags/blog/" style="font-size: 14px;">blog</a> <a href="/tags/hexo/" style="font-size: 14px;">hexo</a> <a href="/tags/markdown/" style="font-size: 14px;">markdown</a> <a href="/tags/react/" style="font-size: 25px;">react</a> <a href="/tags/react-router/" style="font-size: 14px;">react-router</a> <a href="/tags/redux/" style="font-size: 14px;">redux</a> <a href="/tags/tutorial/" style="font-size: 25px;">tutorial</a>
     </div>
@@ -437,7 +443,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title recent-posts">Recent Posts</h3>
+    <h3 class="widget-title recent-posts">最新文章</h3>
     <div class="widget">
       <ul>
         
@@ -464,7 +470,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title archive">Archives</h3>
+    <h3 class="widget-title archive">归档</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li></ul>
     </div>
@@ -503,10 +509,10 @@
   <div class="outer">
     <div id="footer-left">
       &copy; 2014 - 2018 Walle Jiang&nbsp;|&nbsp;
-      Theme by <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
     </div>
      <div id="footer-right">
-      Contact&nbsp;|&nbsp;jiangwalle@gmail.com
+      联系方式&nbsp;|&nbsp;jiangwalle@gmail.com
     </div>
   </div>
 </footer>

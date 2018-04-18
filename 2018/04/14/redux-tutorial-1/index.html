@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="WALL-E">
 <meta property="og:description" content="背景在React应用中，我们通常会把页面拆分成一个个尽可能小的组件，组件的功能越细化、纯粹，可复用性就越高。然而，在实现页面的交互逻辑是，经常会需要涉及到多个组件之间的交互。常见的组件通信方式有：  通过context api来存放需要共享的数据。 使用回调函数在共同的祖先里进行数据交换。  回调函数实例考虑这样一个案例，一个页面中有两个组件构成，&amp;lt;Header /&amp;gt;组件为页面的头部，">
 <meta property="og:image" content="http://yoursite.com/2018/04/14/redux-tutorial-1/redux-flow.jpg">
-<meta property="og:updated_time" content="2018-04-17T20:18:32.574Z">
+<meta property="og:updated_time" content="2018-04-18T12:38:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redux入门教程(一)">
 <meta name="twitter:description" content="背景在React应用中，我们通常会把页面拆分成一个个尽可能小的组件，组件的功能越细化、纯粹，可复用性就越高。然而，在实现页面的交互逻辑是，经常会需要涉及到多个组件之间的交互。常见的组件通信方式有：  通过context api来存放需要共享的数据。 使用回调函数在共同的祖先里进行数据交换。  回调函数实例考虑这样一个案例，一个页面中有两个组件构成，&amp;lt;Header /&amp;gt;组件为页面的头部，">
@@ -44,7 +44,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -139,7 +139,13 @@
 <p>最好把 State 对象设成只读。你没法改变它，要得到新的 State，唯一办法就是生成一个新对象。这样的好处是，任何时候，与某个 View 对应的 State 总是一个不变的对象。</p>
 <h2 id="store-subscribe"><a href="#store-subscribe" class="headerlink" title="store.subscribe()"></a>store.subscribe()</h2><p>Store 允许使用<code>store.subscribe</code>方法设置监听函数，一旦 State 发生变化，就自动执行这个函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">const store = createStore(reducer);</span><br><span class="line"></span><br><span class="line">store.subscribe(listener);</span><br></pre></td></tr></table></figure></p>
 <p>显然，只要把 View 的更新函数（对于 React 项目，就是组件的render方法或setState方法）放入listen，就会实现 View 的自动渲染。<br>store.subscribe方法返回一个函数，调用这个函数就可以解除监听。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">let unsubscribe = store.subscribe(() =&gt;</span><br><span class="line">  console.log(store.getState())</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">unsubscribe();</span><br></pre></td></tr></table></figure></p>
-<h1 id="Reducer的拆分"><a href="#Reducer的拆分" class="headerlink" title="Reducer的拆分"></a>Reducer的拆分</h1><p>Reducer函数负责生成state。由于整个react应用只有一个State对象，包含所有数据，对于大型应用，这个State必然非常庞大，导致reducer也非常庞大。</p>
+<h1 id="Reducer的拆分"><a href="#Reducer的拆分" class="headerlink" title="Reducer的拆分"></a>Reducer的拆分</h1><p>Reducer函数负责生成state。由于整个react应用只有一个State对象，包含所有数据，对于大型应用，这个State必然非常庞大，导致reducer也非常庞大。<br>例如如下的reducer：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">const appReducer = (state = defaultState, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case ADD_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.concat(payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    case DELETE_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.filter(order =&gt; order !== payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    case CHANGE_PASSWORD:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        password: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    case CHANGE_EMAIL:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        email: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    default: return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>上面的三种action，分别修改了state的两种属性。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ADD_ORDER: orders属性，添加一个新order</span><br><span class="line">DELETE_ORDER: orders属性，移除一个order</span><br><span class="line">CHANGE_PASSWORD: password属性，修改password</span><br><span class="line">CHANGE_EMAIL: email属性，修改email</span><br></pre></td></tr></table></figure></p>
+<p>一般来说，orders属性和password属性分别属于不同的页面，前者是订单管理页面，后者是个人信息管理页面。因此，我们可以将整个reducer拆分为两个，一方面方便管理，另一方面，拆分出来的reducer与页面相对应，从而增加了可读性。</p>
+<p>orderReducer.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const orderReducer = (state = defaultState, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case ADD_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.concat(payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    case DELETE_ORDER:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        orders: state.orders.filter(order =&gt; order !== payload)</span><br><span class="line">      &#125;);</span><br><span class="line">    default: return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>userReducer.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">const userReducer = (state = defaultState, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case CHANGE_PASSWORD:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        password: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    case CHANGE_EMAIL:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        email: payload</span><br><span class="line">      &#125;);</span><br><span class="line">    default: return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>redux中提供一个<code>combineReducers</code>方法，用于将所有的子reducer合并成一个。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const rootReducer = combineReducers(&#123;</span><br><span class="line">  orderReducer: orderReducer,</span><br><span class="line">  userReducer: userReducer</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>代码中属性名称和reducer名称相同，可简化为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">const rootReducer = combineReducers(&#123;</span><br><span class="line">  orderReducer,</span><br><span class="line">  userReducer</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 <h1 id="Redux执行流程"><a href="#Redux执行流程" class="headerlink" title="Redux执行流程"></a>Redux执行流程</h1><p><img src="redux-flow.jpg" alt=""><br>首先view发出action<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">store.dispatch(action)</span><br></pre></td></tr></table></figure></p>
 <p>然后，Store会自动调用Reducer，并且传入两个参数，当前的State和s收到的Action。Reducer计算并返回新的State。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">let newState = counterReducer(currentState, action);</span><br></pre></td></tr></table></figure></p>
 <p>State一旦发生变化，Store就会调用监听函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 设置监听函数</span><br><span class="line">store.subscribe(listener);</span><br></pre></td></tr></table></figure></p>
@@ -155,7 +161,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg44649i0001738waatoii8m" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg53306h0004pt8wko17d9ad" class="article-share-link">分享</a>
       
       
       
@@ -167,7 +173,7 @@
     
  <script src="/jquery/jquery.min.js"></script>
   <div id="random_posts">
-    <h2>Recommended Posts</h2>
+    <h2>推荐文章</h2>
     <div class="random_posts_ul">
       <script>
           var random_count =4
@@ -211,7 +217,7 @@
   
   
     <a href="/2018/04/10/react-router-playground/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">下一篇</strong>
       <div class="article-nav-title">react-router基础教程</div>
     </a>
   
@@ -246,7 +252,7 @@
     
       <div class="widget" id="toc-widget-fixed">
       
-        <strong class="toc-title">Content</strong>
+        <strong class="toc-title">文章目录</strong>
         <div class="toc-widget-list">
               <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#回调函数实例"><span class="toc-number">1.1.</span> <span class="toc-text">回调函数实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#困难"><span class="toc-number">1.2.</span> <span class="toc-text">困难</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#redux设计思想"><span class="toc-number">2.</span> <span class="toc-text">redux设计思想</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#redux核心概念"><span class="toc-number">3.</span> <span class="toc-text">redux核心概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Store"><span class="toc-number">3.1.</span> <span class="toc-text">Store</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#State"><span class="toc-number">3.2.</span> <span class="toc-text">State</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Action"><span class="toc-number">3.3.</span> <span class="toc-text">Action</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Action-Creator"><span class="toc-number">3.4.</span> <span class="toc-text">Action Creator</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#store-dispatch"><span class="toc-number">3.5.</span> <span class="toc-text">store.dispatch()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#reducer"><span class="toc-number">3.6.</span> <span class="toc-text">reducer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纯函数"><span class="toc-number">3.7.</span> <span class="toc-text">纯函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#store-subscribe"><span class="toc-number">3.8.</span> <span class="toc-text">store.subscribe()</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reducer的拆分"><span class="toc-number">4.</span> <span class="toc-text">Reducer的拆分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Redux执行流程"><span class="toc-number">5.</span> <span class="toc-text">Redux执行流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#counter实例"><span class="toc-number">6.</span> <span class="toc-text">counter实例</span></a></li></ol>
           </div>
@@ -274,10 +280,10 @@
   <div class="outer">
     <div id="footer-left">
       &copy; 2014 - 2018 Walle Jiang&nbsp;|&nbsp;
-      Theme by <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
     </div>
      <div id="footer-right">
-      Contact&nbsp;|&nbsp;jiangwalle@gmail.com
+      联系方式&nbsp;|&nbsp;jiangwalle@gmail.com
     </div>
   </div>
 </footer>
