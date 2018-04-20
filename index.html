@@ -191,11 +191,12 @@
 <p><code>App</code>组件是UI组件，为应用的根组件，包含<code>TodoAdd</code>, <code>VisibleTodoList</code>, <code>TodoFilter</code>。</p>
 <h2 id="渲染App组件"><a href="#渲染App组件" class="headerlink" title="渲染App组件"></a>渲染App组件</h2><p>修改src/index.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import &apos;./index.css&apos;;</span><br><span class="line">import App from &apos;./App&apos;;</span><br><span class="line">import registerServiceWorker from &apos;./registerServiceWorker&apos;;</span><br><span class="line">import &#123; createStore &#125; from &apos;redux&apos;;</span><br><span class="line">import &#123; Provider &#125; from &apos;react-redux&apos;;</span><br><span class="line">import rootReducer from &apos;./reducers&apos;;</span><br><span class="line"></span><br><span class="line">const store = createStore(rootReducer);</span><br><span class="line"></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;Provider store=&#123;store&#125;&gt; </span><br><span class="line">    &lt;App /&gt;</span><br><span class="line">  &lt;/Provider&gt;, </span><br><span class="line">  document.getElementById(&apos;root&apos;));</span><br><span class="line">  </span><br><span class="line">registerServiceWorker();</span><br></pre></td></tr></table></figure></p>
 <p>调用<code>createStore</code>创建<code>store</code>对象，同时使用<code>Provider</code>将<code>store</code>对象传递到<code>App</code>组件中。</p>
+<h1 id="源码参考"><a href="#源码参考" class="headerlink" title="源码参考"></a>源码参考</h1><p>Todo list: <a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/19/redux-tutorial-2/" data-id="cjg7vgkph00045p8wycblmzt1" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/19/redux-tutorial-2/" data-id="cjg7vk88s0008e78w8440yl48" class="article-share-link">分享</a>
       
       
       
@@ -297,7 +298,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg7vgkqo000t5p8whdiyfn1p" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg7vk88q0007e78wutu1he8k" class="article-share-link">分享</a>
       
       
       
@@ -374,7 +375,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg7vgkpi00055p8wmmiudq7n" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg7vk88p0006e78w3uepkpjo" class="article-share-link">分享</a>
       
       
       
@@ -465,7 +466,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg7vgkpd00015p8wsqpfzqoo" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg7vk88l0002e78wngjvoptj" class="article-share-link">分享</a>
       
       
       
@@ -520,7 +521,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg7vgkpa00005p8wrhscvei9" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg7vk88g0000e78wb0bezs7r" class="article-share-link">分享</a>
       
       
       
