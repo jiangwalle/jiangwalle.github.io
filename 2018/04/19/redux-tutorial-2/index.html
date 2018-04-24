@@ -45,7 +45,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -199,7 +199,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/19/redux-tutorial-2/" data-id="cjg8ljvgf0008mg8whei207c3" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/04/19/redux-tutorial-2/" data-id="cjgea579g0007sd8wrby3fjrd" class="article-share-link">分享</a>
       
       
       
@@ -211,7 +211,7 @@
     
  <script src="/jquery/jquery.min.js"></script>
   <div id="random_posts">
-    <h2>Recommended Posts</h2>
+    <h2>推荐文章</h2>
     <div class="random_posts_ul">
       <script>
           var random_count =4
@@ -254,7 +254,7 @@
 <nav id="article-nav">
   
     <a href="/2018/04/21/redux-tutorial-3/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
+      <strong class="article-nav-caption">上一篇</strong>
       <div class="article-nav-title">
         
           redux入门教程(三) ~ 异步action
@@ -264,7 +264,7 @@
   
   
     <a href="/2018/04/14/redux-tutorial-1/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">下一篇</strong>
       <div class="article-nav-title">redux入门教程(一) ~ 基本用法</div>
     </a>
   
@@ -299,7 +299,7 @@
     
       <div class="widget" id="toc-widget-fixed">
       
-        <strong class="toc-title">Content</strong>
+        <strong class="toc-title">文章目录</strong>
         <div class="toc-widget-list">
               <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#组件拆分"><span class="toc-number">1.</span> <span class="toc-text">组件拆分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#UI组件-representational-component"><span class="toc-number">1.1.</span> <span class="toc-text">UI组件 (representational component)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#容器组件-container-component"><span class="toc-number">1.2.</span> <span class="toc-text">容器组件(container component)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#API函数"><span class="toc-number">2.</span> <span class="toc-text">API函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#connect"><span class="toc-number">2.1.</span> <span class="toc-text">connect()</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mapStateToProps"><span class="toc-number">2.1.1.</span> <span class="toc-text">mapStateToProps()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mapDispatchToProps"><span class="toc-number">2.1.2.</span> <span class="toc-text">mapDispatchToProps()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-Provider-gt-组件"><span class="toc-number">2.2.</span> <span class="toc-text">&lt;Provider&gt;组件</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#实例-Todo-list"><span class="toc-number">3.</span> <span class="toc-text">实例: Todo list</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#定义action"><span class="toc-number">3.1.</span> <span class="toc-text">定义action</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建TodoAdd组件"><span class="toc-number">3.2.</span> <span class="toc-text">创建TodoAdd组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建TODO-reducer"><span class="toc-number">3.3.</span> <span class="toc-text">创建TODO reducer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建Todo列表组件"><span class="toc-number">3.4.</span> <span class="toc-text">创建Todo列表组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TodoList-js"><span class="toc-number">3.4.1.</span> <span class="toc-text">TodoList.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Todo-js"><span class="toc-number">3.4.2.</span> <span class="toc-text">Todo.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#VisibleTodoList-js"><span class="toc-number">3.4.3.</span> <span class="toc-text">VisibleTodoList.js</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建Todo-Filter组件"><span class="toc-number">3.5.</span> <span class="toc-text">创建Todo Filter组件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#添加filter相关的action"><span class="toc-number">3.5.1.</span> <span class="toc-text">添加filter相关的action</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建Link组件"><span class="toc-number">3.5.2.</span> <span class="toc-text">创建Link组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建FilterLink容器组件"><span class="toc-number">3.5.3.</span> <span class="toc-text">创建FilterLink容器组件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建TodoFilter组件"><span class="toc-number">3.5.4.</span> <span class="toc-text">创建TodoFilter组件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#定义App组件"><span class="toc-number">3.6.</span> <span class="toc-text">定义App组件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#渲染App组件"><span class="toc-number">3.7.</span> <span class="toc-text">渲染App组件</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#源码参考"><span class="toc-number">4.</span> <span class="toc-text">源码参考</span></a></li></ol>
           </div>
@@ -327,10 +327,10 @@
   <div class="outer">
     <div id="footer-left">
       &copy; 2014 - 2018 Walle Jiang&nbsp;|&nbsp;
-      Theme by <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
     </div>
      <div id="footer-right">
-      Contact&nbsp;|&nbsp;jiangwalle@gmail.com
+      联系方式&nbsp;|&nbsp;jiangwalle@gmail.com
     </div>
   </div>
 </footer>

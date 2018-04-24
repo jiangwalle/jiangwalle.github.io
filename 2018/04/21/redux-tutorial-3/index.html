@@ -16,7 +16,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/redux-middleware.jpg">
 <meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/todo-with-thunk.png">
 <meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/todos-mock.png">
-<meta property="og:updated_time" content="2018-04-24T23:02:03.000Z">
+<meta property="og:updated_time" content="2018-04-24T23:05:57.565Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redux入门教程(三) ~ 异步action">
 <meta name="twitter:description" content="在前面介绍的redux基本用法中，用户发送Action，store调用reducer立即计算出新的state，再发送到view中重新渲染。 现在有一个问题是，如果这个action是异步的，例如，发送query_order这样的action来查询订单，应该怎么处理呢？ 有这么几个可能的方案：  View：在view中，先发送一个action如start_query_order，然后执行异步操作调用a">
@@ -47,7 +47,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
@@ -172,12 +172,13 @@
 <p>其它保持不变，此时应该能看到应用能够正常运行。如有问题，请查看文字末尾源码链接。</p>
 <h2 id="redux-saga"><a href="#redux-saga" class="headerlink" title="redux-saga"></a>redux-saga</h2><h1 id="源码参考"><a href="#源码参考" class="headerlink" title="源码参考"></a>源码参考</h1><ul>
 <li>Todo List + redux-thunk：<a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-thunk" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-thunk</a></li>
+<li>Todo List + redux-promise-middleware: <a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-promise" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-promise</a></li>
 </ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/21/redux-tutorial-3/" data-id="cjg8ljvgi000bmg8w4sj5y282" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/04/21/redux-tutorial-3/" data-id="cjgea579l000asd8waah6gr0o" class="article-share-link">分享</a>
       
       
       
@@ -189,7 +190,7 @@
     
  <script src="/jquery/jquery.min.js"></script>
   <div id="random_posts">
-    <h2>Recommended Posts</h2>
+    <h2>推荐文章</h2>
     <div class="random_posts_ul">
       <script>
           var random_count =4
@@ -233,7 +234,7 @@
   
   
     <a href="/2018/04/19/redux-tutorial-2/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">下一篇</strong>
       <div class="article-nav-title">redux入门教程(二) ~ React-Redux</div>
     </a>
   
@@ -268,7 +269,7 @@
     
       <div class="widget" id="toc-widget-fixed">
       
-        <strong class="toc-title">Content</strong>
+        <strong class="toc-title">文章目录</strong>
         <div class="toc-widget-list">
               <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#中间件概念"><span class="toc-number">1.</span> <span class="toc-text">中间件概念</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#中间件用法"><span class="toc-number">2.</span> <span class="toc-text">中间件用法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Redux异步中间件"><span class="toc-number">3.</span> <span class="toc-text">Redux异步中间件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#redux-thunk"><span class="toc-number">3.1.</span> <span class="toc-text">redux-thunk</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#介绍"><span class="toc-number">3.1.1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实例：改造Todo-List"><span class="toc-number">3.1.2.</span> <span class="toc-text">实例：改造Todo List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#安装并导入redux-thunk库"><span class="toc-number">3.1.2.1.</span> <span class="toc-text">安装并导入redux-thunk库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#模拟todos-API"><span class="toc-number">3.1.2.2.</span> <span class="toc-text">模拟todos API</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#创建actionCreate函数"><span class="toc-number">3.1.2.3.</span> <span class="toc-text">创建actionCreate函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#添加reducer"><span class="toc-number">3.1.2.4.</span> <span class="toc-text">添加reducer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#更新TodoAdd组件"><span class="toc-number">3.1.2.5.</span> <span class="toc-text">更新TodoAdd组件</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redux-promise"><span class="toc-number">3.2.</span> <span class="toc-text">redux-promise</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#介绍-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实例：改造Todo-List-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">实例：改造Todo List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#安装并使用redux-promise-middleware中间件"><span class="toc-number">3.2.2.1.</span> <span class="toc-text">安装并使用redux-promise-middleware中间件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#改造actionCreator"><span class="toc-number">3.2.2.2.</span> <span class="toc-text">改造actionCreator</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#修改reducer"><span class="toc-number">3.2.2.3.</span> <span class="toc-text">修改reducer</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redux-saga"><span class="toc-number">3.3.</span> <span class="toc-text">redux-saga</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#源码参考"><span class="toc-number">4.</span> <span class="toc-text">源码参考</span></a></li></ol>
           </div>
@@ -296,10 +297,10 @@
   <div class="outer">
     <div id="footer-left">
       &copy; 2014 - 2018 Walle Jiang&nbsp;|&nbsp;
-      Theme by <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
     </div>
      <div id="footer-right">
-      Contact&nbsp;|&nbsp;jiangwalle@gmail.com
+      联系方式&nbsp;|&nbsp;jiangwalle@gmail.com
     </div>
   </div>
 </footer>
