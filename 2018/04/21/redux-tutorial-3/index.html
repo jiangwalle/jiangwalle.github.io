@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>redux入门教程(三) ~ 异步action | WALL-E</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="在前面介绍的redux基本用法中，用户发送Action，store调用reducer立即计算出新的state，再发送到view中重新渲染。 现在有一个问题是，如果这个action是异步的，例如，发送query_order这样的action来查询订单，应该怎么处理呢？ 有这么几个可能的方案：  View：在view中，先发送一个action如start_query_order，然后执行异步操作调用a">
+<meta name="keywords" content="react,tutorial,redux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redux入门教程(三) ~ 异步action">
+<meta property="og:url" content="http://yoursite.com/2018/04/21/redux-tutorial-3/index.html">
+<meta property="og:site_name" content="WALL-E">
+<meta property="og:description" content="在前面介绍的redux基本用法中，用户发送Action，store调用reducer立即计算出新的state，再发送到view中重新渲染。 现在有一个问题是，如果这个action是异步的，例如，发送query_order这样的action来查询订单，应该怎么处理呢？ 有这么几个可能的方案：  View：在view中，先发送一个action如start_query_order，然后执行异步操作调用a">
+<meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/redux-middleware.png">
+<meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/redux-middleware.jpg">
+<meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/todo-with-thunk.png">
+<meta property="og:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/todos-mock.png">
+<meta property="og:updated_time" content="2018-04-24T23:02:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redux入门教程(三) ~ 异步action">
+<meta name="twitter:description" content="在前面介绍的redux基本用法中，用户发送Action，store调用reducer立即计算出新的state，再发送到view中重新渲染。 现在有一个问题是，如果这个action是异步的，例如，发送query_order这样的action来查询订单，应该怎么处理呢？ 有这么几个可能的方案：  View：在view中，先发送一个action如start_query_order，然后执行异步操作调用a">
+<meta name="twitter:image" content="http://yoursite.com/2018/04/21/redux-tutorial-3/redux-middleware.png">
+  
+    <link rel="alternate" href="/atom.xml" title="WALL-E" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">WALL-E</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">机器人瓦力的网络日志</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-redux-tutorial-3" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/21/redux-tutorial-3/" class="article-date">
+  <time datetime="2018-04-20T23:26:46.000Z" itemprop="datePublished">2018-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/随笔/">随笔</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      redux入门教程(三) ~ 异步action
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>在前面介绍的redux基本用法中，用户发送Action，store调用reducer立即计算出新的state，再发送到view中重新渲染。</p>
+<p>现在有一个问题是，如果这个action是异步的，例如，发送query_order这样的action来查询订单，应该怎么处理呢？</p>
+<p>有这么几个可能的方案：</p>
+<ol>
+<li><p>View：在view中，先发送一个action如start_query_order，然后执行异步操作调用api，拿到结果后，再发送一个completed_query_order，表示查询结束。理论上其实是可以的，但是view在功能上是负责页面渲染的，异步操作放在这里并不合适。同时，每一个页面都如此实现，会很繁琐。</p>
+</li>
+<li><p>Reducer：是处理action，并生成新的state的函数。那么是不是可以在reducer里实现上面View中的那套逻辑呢？答案是不可以！因为Reducer在设计上是纯函数，不允许发生异步调用。</p>
+</li>
+<li><p>改造dispatch函数，让异步操作在dispatch的过程中完成。</p>
+</li>
+</ol>
+<p>方案3是可行的，但是需要借助一个东西来实现：redux的中间件<br><img src="redux-middleware.png" alt=""></p>
+<h1 id="中间件概念"><a href="#中间件概念" class="headerlink" title="中间件概念"></a>中间件概念</h1><p>中间件是软件设计中一种很重要的思想，它允许使用者自定义插件，去修改软件允许时的数据流。redux里的中间件跟node的web服务框架Express很类似。</p>
+<p>如图，使用redux-thunk和redux-logger中间件。对dispatch函数增加特定的功能。<br><img src="redux-middleware.jpg" alt=""></p>
+<p>中间件在实现上，是对原有的功能加以包装，如redux-logger伪代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">let next = store.dispatch;</span><br><span class="line">store.dispatch = function dispatchAndLog(action) &#123;</span><br><span class="line">  // 进入redux-logger中间件</span><br><span class="line">  console.log(&apos;dispatching&apos;, action);</span><br><span class="line">  next(action);</span><br><span class="line">  // 准备离开redux-logger中间件</span><br><span class="line">  console.log(&apos;next state&apos;, store.getState());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="中间件用法"><a href="#中间件用法" class="headerlink" title="中间件用法"></a>中间件用法</h1><p>使用<code>redux</code>的中间件，只需要导入中间件，用<code>applyMiddleware</code>函数传入<code>createStore</code>函数即可。</p>
+<p>例如使用<code>logger</code>, <code>thunk</code>, <code>promise</code>中间件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import &#123; applyMiddleware, createStore &#125; from &apos;redux&apos;;</span><br><span class="line">import createLogger from &apos;redux-logger&apos;;</span><br><span class="line">import thunk from &apos;redux-thunk&apos;;</span><br><span class="line">const logger = createLogger();</span><br><span class="line"></span><br><span class="line">const store = createStore(</span><br><span class="line">  reducer,</span><br><span class="line">  applyMiddleware(thunk, promise, logger)</span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<p>注意：</p>
+<ul>
+<li><p>如果<code>createStore</code>函数接受整个应用的初始状态作为参数，那么<code>applyMiddleware</code>就是第三个参数了。如：<code>createStore(reducer, initial_state, applyMiddleware(thunk, promise, logger))</code>。</p>
+</li>
+<li><p>中间件排放的次序有要求，例如logger一定要放到最后面。使用时，要仔细查看文档。</p>
+</li>
+</ul>
+<h1 id="Redux异步中间件"><a href="#Redux异步中间件" class="headerlink" title="Redux异步中间件"></a>Redux异步中间件</h1><h2 id="redux-thunk"><a href="#redux-thunk" class="headerlink" title="redux-thunk"></a>redux-thunk</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>一次异步操作至少需要两个<code>action</code>。</p>
+<p>例如查询订单：</p>
+<ul>
+<li>用户点击页面，触发第一个启动action <code>query_order_start</code>。界面可以根据这个action做出相应的变化，比如显示spin图标，表明正在加载。</li>
+<li>系统发出第二个结束action <code>query_order_success</code> 或者 <code>query_order_error</code>。在请求完毕之后自动触发。</li>
+</ul>
+<p><code>store.dispatch</code>函数默认情况下只能接受一个<code>action</code>对象作为参数，但是，如果能修改<code>dispatch</code>函数，让它接受一个函数作为参数，这个函数中，先发送一个启动<code>action</code>，然后进行异步操作，操作完成后，再发送结束<code>action</code>。那么异步功能就完成了。这就是<code>redux-thunk</code>中间件的设计思想。</p>
+<p>使用时先加载redux-thunk中间件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import &#123; createStore, applyMiddleware &#125; from &apos;redux&apos;;</span><br><span class="line">import thunk from &apos;redux-thunk&apos;;</span><br><span class="line">import reducer from &apos;./reducers&apos;;</span><br><span class="line"></span><br><span class="line">const store = createStore(</span><br><span class="line">  reducer,</span><br><span class="line">  applyMiddleware(thunk)</span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<p>创建actionCreator函数(不是对象)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">const fetchOrders = () =&gt; (dispatch, getState) =&gt; &#123;</span><br><span class="line">  dispatch(&#123;type: &apos;fetch_order_start&apos;&#125;);</span><br><span class="line">  return fetch(&quot;/api/orders&quot;)</span><br><span class="line">    .then(response =&gt; response.json())</span><br><span class="line">    .then(orders =&gt; dispatch(&#123;type: &apos;fetch_order_success&apos;, payload: orders&#125;));</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 调用方法</span><br><span class="line">store.dispatch(fetchOrders());</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：<code>fetchOrders</code>函数的返回值是一个函数，该函数会被<code>redux-thunk</code>中间件调用，并传入<code>dispatch</code>和<code>getState</code>参数。</p>
+<h3 id="实例：改造Todo-List"><a href="#实例：改造Todo-List" class="headerlink" title="实例：改造Todo List"></a>实例：改造Todo List</h3><p>在上篇博客中 redux入门教程(二) ~ React-Redux，我们实现了一个简单的todo应用，现在，我们添加一个功能，从服务器API加载todo列表。</p>
+<p>功能界面如下：<br><img src="todo-with-thunk.png" alt=""></p>
+<h4 id="安装并导入redux-thunk库"><a href="#安装并导入redux-thunk库" class="headerlink" title="安装并导入redux-thunk库"></a>安装并导入redux-thunk库</h4><p>安装redux-thunk库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn add redux-thunk</span><br><span class="line">或者</span><br><span class="line">npm install --save redux-thunk</span><br></pre></td></tr></table></figure></p>
+<p>加载redux-thunk库，修改src/index.js，添加如下代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 导入thunk库</span><br><span class="line">import thunk from &apos;redux-thunk&apos;;</span><br><span class="line"></span><br><span class="line">// 修改createStore函数，使用thunk中间件</span><br><span class="line">const store = createStore(</span><br><span class="line">  rootReducer, </span><br><span class="line">  applyMiddleware(thunk)</span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<h4 id="模拟todos-API"><a href="#模拟todos-API" class="headerlink" title="模拟todos API"></a>模拟todos API</h4><p>既然要从服务器端加载，那么首先我们得有个服务器和相应的api。在这里，我们使用 <a href="https://www.mocky.io/" target="_blank" rel="noopener">https://www.mocky.io/</a> 网站来创建虚拟的api服务。<br><img src="todos-mock.png" alt=""></p>
+<p>这样，我们就有了一个返回todos的api服务：<a href="http://www.mocky.io/v2/5adc14f63100005e00233c04" target="_blank" rel="noopener">http://www.mocky.io/v2/5adc14f63100005e00233c04</a></p>
+<h4 id="创建actionCreate函数"><a href="#创建actionCreate函数" class="headerlink" title="创建actionCreate函数"></a>创建actionCreate函数</h4><p>修改src/actions/index.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">const Todo_API = &quot;http://www.mocky.io/v2/5adc14f63100005e00233c04?mocky-delay=3000ms&quot;;</span><br><span class="line"></span><br><span class="line">export const fetchTodosFromServer = () =&gt; (dispatch, getState) =&gt; &#123;</span><br><span class="line">  dispatch(&#123;type: &apos;FETCH_TODOS_START&apos;&#125;);</span><br><span class="line">  return fetch(Todo_API)</span><br><span class="line">    .then(response =&gt; response.json())</span><br><span class="line">    .then(todos =&gt; &#123;</span><br><span class="line">      dispatch(&#123;type: &apos;FETCH_TODOS_SUCCESS&apos;, payload: todos&#125;);</span><br><span class="line">    &#125;)</span><br><span class="line">    .catch(error =&gt; &#123;</span><br><span class="line">      dispatch(&#123;type: &apos;FETCH_TODOS_ERROR&apos;, payload: error&#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>thunk的核心思想是改造actionCreate，使之返回一个函数，在函数完成所有的异步操作和action的派送。<br>在<code>fetchTodosFromServer</code>函数中，首先发送<code>FETCH_TODOS_START</code> action表明异步查询开始，然后进行异步api调用，调用成功后，发送<code>FETCH_TODOS_SUCCESS</code> action，如果失败，发送<code>FETCH_TODOS_ERROR</code> action。<br><code>fetch</code>函数可以用来发起http请求，返回值为promise类型。</p>
+<h4 id="添加reducer"><a href="#添加reducer" class="headerlink" title="添加reducer"></a>添加reducer</h4><p>添加加载异步todos的reducer<br>src/reducers/app.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">const app = (state = &#123;&#125;, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line"></span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case &apos;FETCH_TODOS_START&apos;:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        &apos;isLoading&apos;: true</span><br><span class="line">      &#125;);</span><br><span class="line">      break;</span><br><span class="line">    case &apos;FETCH_TODOS_SUCCESS&apos;:</span><br><span class="line">    case &apos;FETCH_TODOS_ERROR&apos;:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        &apos;isLoading&apos;: false</span><br><span class="line">      &#125;);</span><br><span class="line">      break;</span><br><span class="line">    default:</span><br><span class="line">      return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default app;</span><br></pre></td></tr></table></figure></p>
+<p>在app reducer中，<code>FETCH_TODOS_START</code> action设置<code>state.app.isLoadin</code>为<code>true</code>。当action为<code>FETCH_TODOS_SUCCESS</code>或者<code>FETCH_TODOS_ERROR</code>时，标明异步操作完成，设置<code>state.app.isLoading</code>为<code>false</code>。</p>
+<p>修改src/reducers/todos.js reducer，添加如下代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">case &apos;FETCH_TODOS_SUCCESS&apos;:</span><br><span class="line">      return [</span><br><span class="line">        ...state,</span><br><span class="line">        ...payload</span><br><span class="line">      ];</span><br><span class="line">      break;</span><br></pre></td></tr></table></figure></p>
+<p><code>payload</code>是从服务器api获取到的todos列表，在这里跟本地的todos数组合并到一起。</p>
+<p>修改src/reducers/index.js，合并新创建的reducer<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import &#123; combineReducers &#125; from &apos;redux&apos;;</span><br><span class="line">import todos from &apos;./todos&apos;;</span><br><span class="line">import visibilityFilter from &apos;./visibilityFilter&apos;;</span><br><span class="line">import app from &apos;./app&apos;;</span><br><span class="line"></span><br><span class="line">export default combineReducers(&#123;</span><br><span class="line">  todos,</span><br><span class="line">  visibilityFilter,</span><br><span class="line"></span><br><span class="line">  // 添加新创建的app reducer</span><br><span class="line">  app</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h4 id="更新TodoAdd组件"><a href="#更新TodoAdd组件" class="headerlink" title="更新TodoAdd组件"></a>更新TodoAdd组件</h4><p>修改src/containers/TodoAdd.js组件，添加注释部分的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">import React, &#123; Component &#125; from &apos;react&apos;;</span><br><span class="line">import &#123; connect &#125; from &apos;react-redux&apos;;</span><br><span class="line"></span><br><span class="line">// 导入fetchTodosFromServer</span><br><span class="line">import &#123; addTodo, fetchTodosFromServer &#125; from &apos;../actions&apos;;</span><br><span class="line"></span><br><span class="line">class TodoAdd extends Component &#123;</span><br><span class="line">  constructor(props) &#123;</span><br><span class="line">    super(props);</span><br><span class="line">    this.todoInput;</span><br><span class="line"></span><br><span class="line">    this.onSubmit = this.onSubmit.bind(this);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  onSubmit(e) &#123;</span><br><span class="line">    e.preventDefault();</span><br><span class="line">    if (!this.todoInput.value.trim()) &#123;</span><br><span class="line">      return;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    this.props.dispatch(addTodo(this.todoInput.value));</span><br><span class="line">    this.todoInput.value = &apos;&apos;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    return (</span><br><span class="line">      &lt;div&gt;</span><br><span class="line">        &lt;form onSubmit=&#123;this.onSubmit&#125;&gt;</span><br><span class="line">          &lt;input ref=&#123;todoInput =&gt; this.todoInput = todoInput&#125; /&gt;</span><br><span class="line">          &lt;button type=&quot;submit&quot;&gt;添加代办事项&lt;/button&gt;</span><br><span class="line">          </span><br><span class="line">          &#123;/* 添加按钮从服务器加载 */&#125;</span><br><span class="line">          &lt;button </span><br><span class="line">            onClick=&#123;() =&gt; this.props.dispatch(fetchTodosFromServer())&#125;</span><br><span class="line">          &gt;</span><br><span class="line"></span><br><span class="line">          &#123;/* 使用isLoading属性，当正在加载时，修改按钮的文字为：正在加载中 */&#125;</span><br><span class="line">            &#123;this.props.isLoading ? &apos;正在加载中。。。&apos; : &apos;从服务器加载Todos&apos;&#125;</span><br><span class="line">          &lt;/button&gt;</span><br><span class="line">        &lt;/form&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 将store中的state.app.isLoading 赋值给 TodoAdd 组件的 props.isLoading</span><br><span class="line">const mapStateToProps = (state) =&gt; (&#123;</span><br><span class="line">  isLoading: state.app.isLoading</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">export default connect(mapStateToProps)(TodoAdd);</span><br></pre></td></tr></table></figure></p>
+<p>好了，代码完成，点击按钮应该可以看到服务器api上的todos列表被加载了。</p>
+<h2 id="redux-promise"><a href="#redux-promise" class="headerlink" title="redux-promise"></a>redux-promise</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p><code>redux-thunk</code>中间件改造<code>dispatch</code>函数，使之接受一个function参数，在function内完成异步操作和真正的action的派送。<br>同时，出现了另一种解决方案<code>redux-promise-middleware</code>，它改造<code>dispatch</code>函数，接受一个payload为<code>promise</code>类型的action。</p>
+<p>例如，有这样一个异步action：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">action = &#123;</span><br><span class="line">  &apos;type&apos;: &apos;FETCH_TODOS&apos;,</span><br><span class="line">  // promise为pending状态时，中间件会自动dispatch一个type为&apos;FETCH_TODOS_PENDING&apos;的action</span><br><span class="line">  payload: new Promise(function(resolve, reject) &#123;</span><br><span class="line">    // 调用fetch函数请求数据</span><br><span class="line">    fetch(Todo_API)</span><br><span class="line">      .then(response =&gt; &#123;</span><br><span class="line">        if (response.ok) &#123;</span><br><span class="line">          // 请求成功，将promise设为resolve状态，中间件会自动dispatch一个type为&apos;FETCH_TODOS_FULFILLED&apos;的action</span><br><span class="line">          resolve(response.json());</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          // 请求失败，将promise设为reject状态，中间件会自动dispatch一个type为&apos;FETCH_TODOS_REJECTED&apos;的action</span><br><span class="line">          reject(response.statusText);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>说明：中间件会根据<code>promise</code>的状态自动<code>dispatch</code>相对应的action。action的<code>type</code>是在原来<code>type</code>的名称上加上后缀。</p>
+<ul>
+<li>pending状态：加上<code>_PENDING</code></li>
+<li>resolve状态：加上<code>_FULFILLED</code></li>
+<li>reject状态：加上<code>_REJECTED</code></li>
+</ul>
+<h3 id="实例：改造Todo-List-1"><a href="#实例：改造Todo-List-1" class="headerlink" title="实例：改造Todo List"></a>实例：改造Todo List</h3><p><code>注意：后续的修改都建立在redux-thunk的demo之上。</code></p>
+<h4 id="安装并使用redux-promise-middleware中间件"><a href="#安装并使用redux-promise-middleware中间件" class="headerlink" title="安装并使用redux-promise-middleware中间件"></a>安装并使用redux-promise-middleware中间件</h4><p>安装redux-promise-middleware<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn add redux-promise-middleware</span><br><span class="line">或者</span><br><span class="line">npm install --save redux-promise-middleware</span><br></pre></td></tr></table></figure></p>
+<p>修改src/index.js，使用redux-promise-middleware中间件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import promiseMiddleware from &apos;redux-promise-middleware&apos;;</span><br><span class="line"></span><br><span class="line">const store = createStore(</span><br><span class="line">  rootReducer, </span><br><span class="line">  applyMiddleware(</span><br><span class="line">    promiseMiddleware()</span><br><span class="line">));</span><br></pre></td></tr></table></figure></p>
+<h4 id="改造actionCreator"><a href="#改造actionCreator" class="headerlink" title="改造actionCreator"></a>改造actionCreator</h4><p>修改src/actions/index.js的fetchTodosFromServer函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">export const fetchTodosFromServer = () =&gt; (&#123;</span><br><span class="line">  type: &apos;FETCH_TODOS&apos;,</span><br><span class="line">  payload: new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">    fetch(Todo_API)</span><br><span class="line">      .then(response =&gt; &#123;</span><br><span class="line">        if (response.ok) &#123;</span><br><span class="line">          resolve(response.json());</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          reject(response.statusText);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>将<code>payload</code>的返回值改造成了<code>promise</code>。</p>
+<h4 id="修改reducer"><a href="#修改reducer" class="headerlink" title="修改reducer"></a>修改reducer</h4><p>修改src/reducers/app.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const app = (state = &#123;&#125;, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line"></span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case &apos;FETCH_TODOS_PENDING&apos;:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        &apos;isLoading&apos;: true</span><br><span class="line">      &#125;);</span><br><span class="line">    case &apos;FETCH_TODOS_FULFILLED&apos;:</span><br><span class="line">    case &apos;FETCH_TODOS_REJECTED&apos;:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        &apos;isLoading&apos;: false</span><br><span class="line">      &#125;);</span><br><span class="line">    default:</span><br><span class="line">      return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default app;</span><br></pre></td></tr></table></figure></p>
+<p>修改src/reducers/todos.js，将FETCH_TODOS_SUCCESS改为FETCH_TODOS_FULFILLED<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">case &apos;FETCH_TODOS_FULFILLED&apos;:</span><br><span class="line">      return [</span><br><span class="line">        ...state,</span><br><span class="line">        ...payload</span><br><span class="line">      ];</span><br></pre></td></tr></table></figure></p>
+<p>其它保持不变，此时应该能看到应用能够正常运行。如有问题，请查看文字末尾源码链接。</p>
+<h2 id="redux-saga"><a href="#redux-saga" class="headerlink" title="redux-saga"></a>redux-saga</h2><h1 id="源码参考"><a href="#源码参考" class="headerlink" title="源码参考"></a>源码参考</h1><ul>
+<li>Todo List + redux-thunk：<a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-thunk" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-thunk</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/04/21/redux-tutorial-3/" data-id="cjg8ljvgi000bmg8w4sj5y282" class="article-share-link">Share</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/react/">react</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/redux/">redux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tutorial/">tutorial</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>Recommended Posts</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/04/19/redux-tutorial-2/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">redux入门教程(二) ~ React-Redux</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">Content</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#中间件概念"><span class="toc-number">1.</span> <span class="toc-text">中间件概念</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#中间件用法"><span class="toc-number">2.</span> <span class="toc-text">中间件用法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Redux异步中间件"><span class="toc-number">3.</span> <span class="toc-text">Redux异步中间件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#redux-thunk"><span class="toc-number">3.1.</span> <span class="toc-text">redux-thunk</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#介绍"><span class="toc-number">3.1.1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实例：改造Todo-List"><span class="toc-number">3.1.2.</span> <span class="toc-text">实例：改造Todo List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#安装并导入redux-thunk库"><span class="toc-number">3.1.2.1.</span> <span class="toc-text">安装并导入redux-thunk库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#模拟todos-API"><span class="toc-number">3.1.2.2.</span> <span class="toc-text">模拟todos API</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#创建actionCreate函数"><span class="toc-number">3.1.2.3.</span> <span class="toc-text">创建actionCreate函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#添加reducer"><span class="toc-number">3.1.2.4.</span> <span class="toc-text">添加reducer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#更新TodoAdd组件"><span class="toc-number">3.1.2.5.</span> <span class="toc-text">更新TodoAdd组件</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redux-promise"><span class="toc-number">3.2.</span> <span class="toc-text">redux-promise</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#介绍-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实例：改造Todo-List-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">实例：改造Todo List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#安装并使用redux-promise-middleware中间件"><span class="toc-number">3.2.2.1.</span> <span class="toc-text">安装并使用redux-promise-middleware中间件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#改造actionCreator"><span class="toc-number">3.2.2.2.</span> <span class="toc-text">改造actionCreator</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#修改reducer"><span class="toc-number">3.2.2.3.</span> <span class="toc-text">修改reducer</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redux-saga"><span class="toc-number">3.3.</span> <span class="toc-text">redux-saga</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#源码参考"><span class="toc-number">4.</span> <span class="toc-text">源码参考</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2018 Walle Jiang&nbsp;|&nbsp;
+      Theme by <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      Contact&nbsp;|&nbsp;jiangwalle@gmail.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
