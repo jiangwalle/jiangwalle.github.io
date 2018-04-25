@@ -165,15 +165,44 @@
 <h4 id="修改reducer"><a href="#修改reducer" class="headerlink" title="修改reducer"></a>修改reducer</h4><p>修改src/reducers/app.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const app = (state = &#123;&#125;, action = &#123;&#125;) =&gt; &#123;</span><br><span class="line">  const &#123; type, payload &#125; = action;</span><br><span class="line"></span><br><span class="line">  switch (type) &#123;</span><br><span class="line">    case &apos;FETCH_TODOS_PENDING&apos;:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        &apos;isLoading&apos;: true</span><br><span class="line">      &#125;);</span><br><span class="line">    case &apos;FETCH_TODOS_FULFILLED&apos;:</span><br><span class="line">    case &apos;FETCH_TODOS_REJECTED&apos;:</span><br><span class="line">      return Object.assign(&#123;&#125;, state, &#123;</span><br><span class="line">        &apos;isLoading&apos;: false</span><br><span class="line">      &#125;);</span><br><span class="line">    default:</span><br><span class="line">      return state;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default app;</span><br></pre></td></tr></table></figure></p>
 <p>修改src/reducers/todos.js，将FETCH_TODOS_SUCCESS改为FETCH_TODOS_FULFILLED<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">case &apos;FETCH_TODOS_FULFILLED&apos;:</span><br><span class="line">      return [</span><br><span class="line">        ...state,</span><br><span class="line">        ...payload</span><br><span class="line">      ];</span><br></pre></td></tr></table></figure></p>
 <p>其它保持不变，此时应该能看到应用能够正常运行。如有问题，请查看文字末尾源码链接。</p>
-<h2 id="redux-saga"><a href="#redux-saga" class="headerlink" title="redux-saga"></a>redux-saga</h2><h1 id="源码参考"><a href="#源码参考" class="headerlink" title="源码参考"></a>源码参考</h1><ul>
+<h2 id="redux-saga"><a href="#redux-saga" class="headerlink" title="redux-saga"></a>redux-saga</h2><h3 id="什么是saga"><a href="#什么是saga" class="headerlink" title="什么是saga"></a>什么是saga</h3><p>另一个著名的redux中间件，它采用了和上面两个库完全不同的设计理念。它让异步行为成为架构中独立的一层(称为saga)，既不在action creator中，也不和reducer沾边。</p>
+<p>它的出发点是把副作用 (Side effect，异步行为就是典型的副作用) 看成”线程”，可以通过普通的action去触发它，当副作用完成时也会触发action作为输出。</p>
+<p>具体特点为：</p>
+<ul>
+<li>redux-saga 完全基于 Es6 的 Generator Function</li>
+<li>不使用 actionCreator 策略，而是通过监控 action, 然后在自动做处理</li>
+<li>所有带副作用的操作（异步代码， 业务控制逻辑代码）都被放到 saga 中</li>
+</ul>
+<p>到底什么是 saga</p>
+<blockquote>
+<p>The term saga is commonly used in discussions of CQRS to refer to a piece of code that coordinates and routes messages between bounded contexts and aggregates.</p>
+</blockquote>
+<p>这个定义的核心就是 CQRS-查询与责任分离 ，对应到 redux-sage 就是 action 与 处理函数的分离。 实际上在 redux-saga 中，一个 saga 就是一个 Generator 函数。</p>
+<p>例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import &#123; takeEvery, takeLatest &#125; from &apos;redux-saga&apos;</span><br><span class="line">import &#123; call, put &#125; from &apos;redux-saga/effects&apos;</span><br><span class="line">import Api from &apos;...&apos;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * 一个 saga 就是一个 Generator Function </span><br><span class="line"> *</span><br><span class="line"> * 每当 store.dispatch `USER_FETCH_REQUESTED` action 的时候都会调用 fetchUser.</span><br><span class="line"> */</span><br><span class="line">function* mySaga() &#123;</span><br><span class="line">  yield* takeEvery(&quot;USER_FETCH_REQUESTED&quot;, fetchUser);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * worker saga： 真正处理 action 的 saga</span><br><span class="line"> *  </span><br><span class="line"> * USER_FETCH_REQUESTED action 触发时被调用</span><br><span class="line"> * @param &#123;[type]&#125; action  [description]</span><br><span class="line"> * @yield &#123;[type]&#125; [description]</span><br><span class="line"> */</span><br><span class="line">function* fetchUser(action) &#123;</span><br><span class="line">   try &#123;</span><br><span class="line">      const user = yield call(Api.fetchUser, action.payload.userId);</span><br><span class="line">      yield put(&#123;type: &quot;USER_FETCH_SUCCEEDED&quot;, user: user&#125;);</span><br><span class="line">   &#125; catch (e) &#123;</span><br><span class="line">      yield put(&#123;type: &quot;USER_FETCH_FAILED&quot;, message: e.message&#125;);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="saga术语解释"><a href="#saga术语解释" class="headerlink" title="saga术语解释"></a>saga术语解释</h3><ul>
+<li>watcher saga：负责编排和派发任务的 saga</li>
+<li>worker saga：真正负责处理 action 的函数</li>
+<li>saga helper：如上面例子中的 takeEvery，简单理解就是用于监控 action 并派发 action 到 worker saga 的辅助函数</li>
+<li>Effect：redux-saga 完全基于 Generator 构建，saga 逻辑的表达是通过 yield javascript 对象来实现，这些对象就是Effects。这些对象相当于描述任务的规范化数据（任务如执行异步函数，dispatch action 到一个 store），这些数据被发送到redux-saga中间件中执行。</li>
+</ul>
+<p>通过这种 effect 的抽象，可以避免 call 和 dispatch 的立即执行，而是描述要执行什么任务，这样的话就很容易对 saga 进行测试，saga 所做的事情就是将这些 effect 编排起来用于描述任务，真正的执行都会放在 middleware 中执行。</p>
+<h3 id="实例：改造Todo-List-2"><a href="#实例：改造Todo-List-2" class="headerlink" title="实例：改造Todo List"></a>实例：改造Todo List</h3><p><code>注意：代码在redux-thunk的版本上完成。</code></p>
+<p>安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yarn add redux-saga</span><br><span class="line">或者</span><br><span class="line">npm install --save redux-saga</span><br></pre></td></tr></table></figure></p>
+<p>使用saga中间件，修改src/index.js为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import React from &apos;react&apos;;</span><br><span class="line">import ReactDOM from &apos;react-dom&apos;;</span><br><span class="line">import App from &apos;./App&apos;;</span><br><span class="line">import &#123; createStore, applyMiddleware &#125; from &apos;redux&apos;;</span><br><span class="line">import &#123; Provider &#125; from &apos;react-redux&apos;;</span><br><span class="line">import createSagaMiddleware from &apos;redux-saga&apos;;</span><br><span class="line">import rootReducer from &apos;./reducers&apos;;</span><br><span class="line">import todoSaga from &apos;./sagas&apos;;</span><br><span class="line"></span><br><span class="line">// 创建saga中间件</span><br><span class="line">const sagaMiddleware = createSagaMiddleware();</span><br><span class="line"></span><br><span class="line">// 添加saga中间件</span><br><span class="line">const store = createStore(</span><br><span class="line">  rootReducer, </span><br><span class="line">  applyMiddleware(sagaMiddleware)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">ReactDOM.render(</span><br><span class="line">  &lt;Provider store=&#123;store&#125;&gt; </span><br><span class="line">    &lt;App /&gt;</span><br><span class="line">  &lt;/Provider&gt;, </span><br><span class="line">  document.getElementById(&apos;root&apos;));</span><br><span class="line"></span><br><span class="line">// 立即运行saga，让监控器开始监控</span><br><span class="line">sagaMiddleware.run(todoSaga);</span><br></pre></td></tr></table></figure></p>
+<p>创建saga文件。<br>src/sagas/index.js<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">import &#123; takeEvery &#125; from &apos;redux-saga&apos;;</span><br><span class="line">import &#123; call, put &#125; from &apos;redux-saga/effects&apos;;</span><br><span class="line"></span><br><span class="line">const Todo_API = &quot;http://www.mocky.io/v2/5adc14f63100005e00233c04?mocky-delay=3000ms&quot;;</span><br><span class="line"></span><br><span class="line">function* fetchTodos(action) &#123;</span><br><span class="line">  try &#123;</span><br><span class="line">    yield put(&#123;type: &apos;FETCH_TODOS_PENDING&apos;&#125;);</span><br><span class="line">    const response = yield call(fetch, Todo_API);</span><br><span class="line">    const todos = yield response.json();</span><br><span class="line">    yield put(&#123;type: &apos;FETCH_TODOS_SUCCESS&apos;, payload: todos&#125;);</span><br><span class="line">  &#125; catch (e) &#123;</span><br><span class="line">    yield put(&#123;type: &apos;FETCH_TODOS_ERROR&apos;, payload: e&#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function* todoSaga() &#123;</span><br><span class="line">  yield* takeEvery(&quot;FETCH_TODOS&quot;, fetchTodos);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export default todoSaga;</span><br></pre></td></tr></table></figure></p>
+<p>代码说明：导出<code>todoSaga</code>函数，<code>takeEvery</code>函数表明监听<code>store</code>中的每一个<code>FETCH_TODOS</code>事件，调用<code>fetchTodos</code>来处理。<br>在<code>fetchTodos</code>中，先发送一个<code>FETCH_TODOS_PENDING</code>的action，然后调用<code>fetch</code>函数进行API请求。拿到结果后，在发送成功或者失败的action。</p>
+<p>修改actionCreator： src/actions/index.js，将fetchTodosFromServer修改成返回一个普通的action对象<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export const fetchTodosFromServer = () =&gt; (&#123;</span><br><span class="line">  type: &apos;FETCH_TODOS&apos;,</span><br><span class="line">  payload: &apos;&apos;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<p>代码完毕。</p>
+<h1 id="源码参考"><a href="#源码参考" class="headerlink" title="源码参考"></a>源码参考</h1><ul>
 <li>Todo List + redux-thunk：<a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-thunk" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-thunk</a></li>
 <li>Todo List + redux-promise-middleware: <a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-promise" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-promise</a></li>
+<li>Todo List + redux-saga: <a href="https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-saga" target="_blank" rel="noopener">https://github.com/jiangwalle/reudx-tutorial/tree/todolist-redux-saga</a></li>
 </ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/21/redux-tutorial-3/" data-id="cjgea579l000asd8waah6gr0o" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/21/redux-tutorial-3/" data-id="cjg8ljvgi000bmg8w4sj5y282" class="article-share-link">分享</a>
       
       
       
@@ -311,7 +340,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/19/redux-tutorial-2/" data-id="cjgea579g0007sd8wrby3fjrd" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/19/redux-tutorial-2/" data-id="cjg8ljvgf0008mg8whei207c3" class="article-share-link">分享</a>
       
       
       
@@ -413,7 +442,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjgea579e0006sd8wxqjal10l" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/14/redux-tutorial-1/" data-id="cjg8ljvge0007mg8wv1iikdpl" class="article-share-link">分享</a>
       
       
       
@@ -490,7 +519,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjgea579d0005sd8w0qnbc1dp" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/04/10/react-router-playground/" data-id="cjg8ljvgc0006mg8w83wz1wk0" class="article-share-link">分享</a>
       
       
       
@@ -581,7 +610,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjgea57990002sd8wivup7d0u" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/02/17/markdown/" data-id="cjg8ljvg80002mg8wkb8pn70a" class="article-share-link">分享</a>
       
       
       
@@ -636,7 +665,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjgea57950000sd8wqo661pya" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2018/02/17/hexo-setup-1/" data-id="cjg8ljvg30000mg8wxjuutwog" class="article-share-link">分享</a>
       
       
       
